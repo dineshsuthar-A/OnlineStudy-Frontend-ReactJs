@@ -1,0 +1,35 @@
+.txtfield{
+        width: 50%;
+        margin-top: 10px;
+}
+.txtfield-Address{
+    width: 75%;
+    margin-top: 10px;
+}
+
+
+
+
+@media  screen and (max-width: 960px) {
+    .txtfield{
+        width: 100%;
+        text-align: center;
+    }
+    .txtfield-Address{
+        width: 100%;
+        margin-top: 10px;
+    }
+
+}
+
+
+.buttons{
+    text-align: center;
+}
+.buttons > .save{
+  margin-left: 50px;
+}
+
+.buttons > .edit{
+    margin-right: 50px;
+  }

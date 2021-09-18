@@ -1,0 +1,36 @@
+.main{
+    background-color: #f2f2f2;
+}
+
+.welcome{
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    margin: 10px;
+    border: 1px solid #d3d3d3;
+}
+
+.welcomeMessage{
+    margin-top: 40px;
+    text-align: center;
+    font-size: 35px;
+}
+
+.testHeading{
+    font-size: 35px;
+    font-weight: bolder;
+    text-align: center;
+}
+.testInfo{
+   text-align: center;
+}
+
+.attemptBtn{
+    align-self: center;
+    color: white;
+    text-align: center;
+    margin: 10px;
+}

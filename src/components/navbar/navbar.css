@@ -1,0 +1,258 @@
+.navBar-horizontal{
+    position: sticky;
+    z-index: 100;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    background-color: #0B3F64;
+    height: 80px;
+    
+
+}
+.leftp{
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-around;
+}
+.sideBarButton{
+    color: white;
+    visibility: hidden;
+    cursor: pointer;
+}
+.logo{
+    color: white;
+    font-weight: bold;
+    font-size: 22px;
+    align-self: center;
+    font-family: sans-serif;
+}
+.logo-link{
+    text-decoration: none;
+    color: white;
+}
+.logo-link:hover{
+    color: white;
+}
+.rightitems{
+    margin-top: 13px;
+    color: white;
+    display: flex;
+}
+.menuOptions{
+    display: flex;
+
+}
+.iconnotification:hover{
+ cursor: pointer;
+}
+.iconavatar:hover{
+    cursor: pointer;
+    
+}
+.iconavatar::selection{
+    background-color: rgba(0, 0, 0, 0.486);
+}
+.rightIcon{
+    display: flex;
+    float: left;
+    flex-direction: row;
+    align-items: center;
+}
+.nav-text-horizontal{
+    list-style: none;
+    
+}
+.nav-text-horizontal a{
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    width: 95%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0px 16px;
+    border-radius: 4px;
+}
+.iconquery{
+    color: white;
+    cursor: pointer;
+}
+
+
+.avatarbuttondiv{
+    display: inline-block;
+    overflow: visible;
+}
+.dropdown{
+  min-width: 160px;
+  z-index: 100;
+  width: 100%;
+  display:flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.dropdown a{
+    text-decoration: none;
+    color:black;
+}
+
+
+
+
+
+.active{
+    background-color: rgb(255, 0, 0);
+}
+
+
+.nav-menu{
+    background-color: #0B3F64;
+    display: flex;
+    justify-content: center;
+    color: white;
+    width: 25%;
+    height: 100vh;
+    position: fixed;
+    top:0;
+    left: -100%;
+    visibility: hidden;
+    transition: 850ms;
+    z-index: 100000;
+}
+
+
+
+.nav-menu.active{
+    left: 0%;
+    transition: 350ms;
+}
+
+
+
+.nav-text{
+    width: 100%+30px;
+    margin-left: -30px;
+    display: flex;
+    justify-content: flex-start;
+    padding: 8px 0px 8px 16px;
+    align-items: center;
+    list-style: none;
+    height:60px;
+
+}
+
+.nav-text a{
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    width: 95%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0px 16px;
+    border-radius: 4px;
+}
+
+
+
+ .nav-text-horizontal  a:hover{
+     color: grey;
+ }
+
+ 
+ .nav-menu-items{
+     width: 100%;
+ }
+
+
+ .navbar-toggle{
+
+    background-color: #0B3F64;
+     width: 100%+30px;
+     margin-left: -30px;
+     height: 150px;
+     display: flex;
+     padding-right: 10%;
+     cursor: pointer;
+     padding-left: 10px;
+     padding-right: 10px;
+     justify-content: space-between;
+     align-items: center;
+     border-bottom: 1px solid gainsboro;
+ }
+
+
+ .imageTag{
+   
+     width: 150px;
+ }
+
+
+ .header{
+     padding-left: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+ }
+
+
+ .header >   h4{
+     margin-top: 10px;
+    font-size: 18px;
+}
+
+ .spanText{
+     margin-left: 16px;
+ }
+ @media screen and (max-width:1100px){
+     .rightitems{
+         padding-left: 0;
+         font-size: 17px;
+     }
+     
+ }
+
+ @media  screen and (max-width: 990px) {
+    .nav-menu{
+        width: 50%;
+        height: 100%;
+        visibility:visible;
+    }
+    .nav-menu{
+        width: 40%;
+        height: 100%;
+        visibility:visible;
+    }
+    
+    .sideBarButton{
+        display: block;
+        visibility: inherit;
+    }
+    .rightitems{
+        display: none;
+        visibility: hidden;
+    }
+    .logo{
+        display: block;
+        align-content: center;
+    }
+    .navBar-horizontal{
+        position: sticky;
+        z-index: 100;
+        display:flex;
+        background-color: #0B3F64;;
+        align-items: center;
+    
+    }
+   
+}
+
+
+@media  screen and (max-width:570px) {
+    .nav-menu{
+        width: 70%;
+        height: 100%;
+    }
+   
+}

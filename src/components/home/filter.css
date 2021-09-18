@@ -1,0 +1,13 @@
+.filterDiv{
+    display: flex;
+    justify-content: space-between;
+    padding: 1%;
+    padding-right: 5%;
+    padding-left: 5%;
+    align-items: center;
+    background-color: white;
+}
+
+.filters > select{
+    padding: 10px;
+}

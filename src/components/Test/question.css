@@ -1,0 +1,181 @@
+.Nocard{
+    border: 1px solid #d3d3d3;
+    background-color: white;
+    border-radius:7px ;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    width: 40px;
+    height: 60px;
+    margin-left: 10px;
+    margin-bottom: 20px;
+
+}
+.Nocardactive{
+    border: 2px solid black;
+    cursor: pointer;
+    background-color: white;
+    border-radius:7px ;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 60px;
+    margin-left: 10px;
+    margin-bottom: 20px;
+
+}
+.NocardDone{
+    border: 1px solid #d3d3d3;
+    cursor: pointer;
+    background-color: gray;
+    border-radius:7px ;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 60px;
+    margin-left: 10px;
+    margin-bottom: 20px;
+}
+.NocardDoneactive{
+    border: 2px solid black;
+    cursor: pointer;
+    background-color: gray;
+    border-radius:7px ;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 60px;
+    margin-left: 10px;
+    margin-bottom: 20px;
+}
+.leftBars{
+    margin-top: 10px;
+    position: absolute;
+    right: 0;
+    top:0;
+    width: 25%;
+    transition: 500ms;
+}
+.buttonSidebar{
+    position: fixed; 
+    right: 0px;
+    top: 450px;
+    outline: none;
+    border-bottom-left-radius: 25px;
+    border-top-left-radius: 25px;
+    border: 1px solid #d3d3d3;
+    height: 50px;
+    width: 60px;
+}
+.leftBarsactive{
+    margin-top: 10px;
+    top: 0;
+    position: fixed;
+    right: 0;
+    width: 25%;
+    transition: 500ms;
+    z-index: 100;
+
+}
+.closeSidebar{
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     cursor: pointer;
+     height:75px;
+     visibility: hidden;
+     top: 0;
+     background-color: white;
+     z-index: 100;
+     border: 1px solid #d3d3d3;
+}
+@media screen and (max-width:610px) {
+    .leftBars{
+        right: -100%;
+        overflow: hidden;
+        position: fixed;
+        visibility: hidden;
+        transition: 500ms;
+    }
+    .leftBarsactive{
+        top: 0;
+        visibility: visible;
+        right: 0;
+        width: 60%;
+        margin-top: 10px;
+        transition: 600ms;
+        z-index: 100;
+    
+    }
+    .closeSidebar{
+        visibility:visible;
+    }
+
+    
+    
+}
+.navControl{
+    margin-left: 10px;
+    display: flex;
+    border: 1px solid #d3d3d3;
+    justify-content: space-between;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+.navigationButton{
+    width: 150px;
+    border-radius: 0;
+    border: 1px solid #d3d3d3;
+}
+.sidebarNavigation{
+    
+    display: flex;
+    overflow-y:auto;
+    width: 100%;
+    padding-top: 10px;
+    border: 1px solid #d3d3d3;
+    scrollbar-color: rgba(255, 255, 255, 0);
+    align-content: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    height:430px;
+    z-index: 10;
+    background-color: white;
+}
+.finishButton{
+    position: absolute;
+    right: 0;
+    width: 100%;
+    border-radius: 0px;
+    border:1px solid #d3d3d3;
+}
+
+.tag{
+    border: 1px solid black;
+    border-radius: 10px;
+    color: black;
+    background-color: white;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+
+}
+.tagactive{
+    border: 1px solid #d3d3d3;
+    border-radius: 10px;
+    color: white;
+    background-color: black;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+
+
+}
