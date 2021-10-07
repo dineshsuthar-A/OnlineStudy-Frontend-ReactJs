@@ -2,6 +2,8 @@ import { Grid } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { baseImageUrl } from '../../config';
 import './review.css';
+import parse from 'html-react-parser';
+
 
 
 export default function ReviewAnswer(props) {
@@ -38,7 +40,6 @@ export default function ReviewAnswer(props) {
     }
 
     const correctCheck = (sanswer, answer, option) => {
-        console.log(answer, option);
         if (answer === option) {
             return true;
         } else
@@ -69,23 +70,46 @@ export default function ReviewAnswer(props) {
                     review.map((item, index) =>
                         <Grid item xs={12} md={7} style={{ border: "1px solid #d3d3d3", backgroundColor: "#f9f9f9", padding: "0px", marginBottom: "10px" }}>
 
-                            <h6 className={(item.answerStatus === 'false') ? "wrongQuestion" : (item.answerStatus === 'true') ? "correctQuestion" : "skippedQuestion"} >{index + 1 + ". "} {(item.mcQuestions.hindiQuestion == null) ? item.mcQuestions.englishQuestion : item.mcQuestions.hindiQuestion}</h6>
+                            <h6 className={(item.answerStatus === 'false') ? "wrongQuestion" : (item.answerStatus === 'true') ? "correctQuestion" : "skippedQuestion"} >{index + 1 + ". "} {(item.mcQuestions.hindiQuestion != null) ? parse(item.mcQuestions.hindiQuestion) : null}<span>{(item.mcQuestions.englishQuestion != null) ? parse(item.mcQuestions.englishQuestion) : null}</span></h6>
+
                             {
                                 (item.mcQuestions.questionPhoto != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "280px", alignSelf: "center" }} src={baseImageUrl + item.mcQuestions.questionPhoto} alt="Not Loaded. Check you internet connection" /> : undefined
                             }
                             <Grid items xs={12} >
-                                <p className={(correctCheck(item.studentAnswer, item.mcQuestions.answer, 0)) ? "correctAnswer" : (wrongCheck(item.studentAnswer, item.mcQuestions.answer, 0)) ? "wrongAnswer" : "answer"}> a) {(item.mcQuestions.engAnsA == null) ? (item.mcQuestions.hinAnsA == null) ? (item.mcQuestions.photoA != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + item.mcQuestions.photoA} alt="Not Loaded. Check you internet connection" /> : undefined : item.mcQuestions.hinAnsA : item.mcQuestions.engAnsA}</p>
+                                <p className={(correctCheck(item.studentAnswer, item.mcQuestions.answer, 0)) ? "correctAnswer" : (wrongCheck(item.studentAnswer, item.mcQuestions.answer, 0)) ? "wrongAnswer" : "answer"}> a) {(item.mcQuestions.hinAnsA != null) ? parse(item.mcQuestions.hinAnsA) : undefined}<span>{(item.mcQuestions.engAnsA != null) ? parse(item.mcQuestions.engAnsA) : null}</span></p>
+
+                                {
+                                    (item.mcQuestions.photoA != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + item.mcQuestions.photoA} alt="Not Loaded. Check you internet connection" /> : undefined
+                                }
                             </Grid>
                             <Grid items xs={12}>
-                                <p className={(correctCheck(item.studentAnswer, item.mcQuestions.answer, 1)) ? "correctAnswer" : (wrongCheck(item.studentAnswer, item.mcQuestions.answer, 1)) ? "wrongAnswer" : "answer"}> b) {(item.mcQuestions.engAnsB == null) ? (item.mcQuestions.hinAnsB == null) ? (item.mcQuestions.photoB != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + item.mcQuestions.photoB} alt="Not Loaded. Check you internet connection" /> : undefined : item.mcQuestions.hinAnsB : item.mcQuestions.engAnsB}</p>
+                                <p className={(correctCheck(item.studentAnswer, item.mcQuestions.answer, 1)) ? "correctAnswer" : (wrongCheck(item.studentAnswer, item.mcQuestions.answer, 0)) ? "wrongAnswer" : "answer"}> b) {(item.mcQuestions.hinAnsB != null) ? parse(item.mcQuestions.hinAnsB) : undefined}<span>{(item.mcQuestions.engAnsB != null) ? parse(item.mcQuestions.engAnsB) : null}</span></p>
+                                {
+                                    (item.mcQuestions.photoB != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + item.mcQuestions.photoB} alt="Not Loaded. Check you internet connection" /> : undefined
+                                }
                             </Grid>
                             <Grid items xs={12}>
-                                <p className={(correctCheck(item.studentAnswer, item.mcQuestions.answer, 2)) ? "correctAnswer" : (wrongCheck(item.studentAnswer, item.mcQuestions.answer, 2)) ? "wrongAnswer" : "answer"}> c) {(item.mcQuestions.engAnsC == null) ? (item.mcQuestions.hinAnsC == null) ? (item.mcQuestions.photoC != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + item.mcQuestions.photoC} alt="Not Loaded. Check you internet connection" /> : undefined : item.mcQuestions.hinAnsC : item.mcQuestions.engAnsC}</p>
+                                <p className={(correctCheck(item.studentAnswer, item.mcQuestions.answer, 2)) ? "correctAnswer" : (wrongCheck(item.studentAnswer, item.mcQuestions.answer, 0)) ? "wrongAnswer" : "answer"}> c) {(item.mcQuestions.hinAnsC != null) ? parse(item.mcQuestions.hinAnsC) : undefined}<span>{(item.mcQuestions.engAnsC != null) ? parse(item.mcQuestions.engAnsC) : null}</span></p>
+                                {
+                                    (item.mcQuestions.photoC != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + item.mcQuestions.photoC} alt="Not Loaded. Check you internet connection" /> : undefined
+                                }
                             </Grid>
                             <Grid items xs={12}>
-                                <p className={(correctCheck(item.studentAnswer, item.mcQuestions.answer, 3)) ? "correctAnswer" : (wrongCheck(item.studentAnswer, item.mcQuestions.answer, 3)) ? "wrongAnswer" : "answer"}> d) {(item.mcQuestions.engAnsD == null) ? (item.mcQuestions.hinAnsD == null) ? (item.mcQuestions.photoD != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + item.mcQuestions.photoD} alt="Not Loaded. Check you internet connection" /> : undefined : item.mcQuestions.hinAnsD : item.mcQuestions.engAnsD}</p>
+                                <p className={(correctCheck(item.studentAnswer, item.mcQuestions.answer, 3)) ? "correctAnswer" : (wrongCheck(item.studentAnswer, item.mcQuestions.answer, 0)) ? "wrongAnswer" : "answer"}> d) {(item.mcQuestions.hinAnsD != null) ? parse(item.mcQuestions.hinAnsD) : undefined}<span>{(item.mcQuestions.engAnsD != null) ? parse(item.mcQuestions.engAnsD) : null}</span></p>
+                                {
+                                    (item.mcQuestions.photoD != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + item.mcQuestions.photoD} alt="Not Loaded. Check you internet connection" /> : undefined
+                                }
                             </Grid>
-                        </Grid>)
+                            <Grid item xs={12} style={{ backgroundColor: "#f9f9f9", marginBottom: "-10px" }}>{
+                                (item.mcQuestions.explaination != null)
+                                    ? <h6 className="skippedQuestion">Explaination: <br /><img style={{ marginTop: "20px", width: "250px", height: "auto" }} src={baseImageUrl + item.mcQuestions.explaination} alt="Not loaded.." /> </h6>
+                                    : null
+                            }
+                            </Grid>
+
+                        </Grid>
+
+                    )
                 }
             </Grid>
         </div >

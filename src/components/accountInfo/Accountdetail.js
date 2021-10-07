@@ -7,6 +7,9 @@ import Axios from 'axios';
 import { baseImageUrl } from '../../config';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import { useHistory } from 'react-router';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -14,7 +17,8 @@ function Alert(props) {
 
 
 export default function Accountdetail() {
-
+    const history = useHistory();
+    const [loading, setloading] = useState(true);
     const [open, setOpen] = React.useState(false);
     const [edit, setEdit] = useState(true);
     const [image, setimage] = useState(null);
@@ -28,6 +32,12 @@ export default function Accountdetail() {
     const [state, setstate] = useState();
     const [pin, setpin] = useState();
     const [openerror, setOpenerror] = React.useState(false);
+
+    const handleChangePassword = () => {
+        history.push({
+            pathname: "/changePassword"
+        })
+    }
 
     const handlesnackerrorClick = () => {
         setOpenerror(true);
@@ -94,6 +104,7 @@ export default function Accountdetail() {
 
     const getacdp = () => {
         getAccountdetails().then((response) => {
+
             if (response.data.personalInfo) {
                 setname(response.data.personalInfo.name);
                 setpin(response.data.personalInfo.pinCode);
@@ -104,6 +115,7 @@ export default function Accountdetail() {
                 setdistrict(response.data.personalInfo.district);
                 setaddress(response.data.personalInfo.town);
                 setmobile(response.data.phoneNumber);
+                setloading(false);
                 if (response.data.personalInfo.photo != null)
                     setimage(baseImageUrl + response.data.personalInfo.photo);
             }
@@ -116,13 +128,16 @@ export default function Accountdetail() {
     }
 
     const handlemobileChange = (e) => {
-        setmobile(e.target.value);
+        if (!isNaN(e.target.value))
+            if (e.target.value.length <= 10)
+                setmobile(e.target.value);
 
     }
 
     const handlewhatsChange = (e) => {
-        setwhats(e.target.value);
-
+        if (!isNaN(e.target.value))
+            if (e.target.value.length <= 10)
+                setwhats(e.target.value);
     }
 
     const handleemailChange = (e) => {
@@ -155,11 +170,13 @@ export default function Accountdetail() {
 
     }
 
+
+
     useEffect(() => {
         getacdp();
     }, [])
 
-    return (
+    return ((!loading)?
         <div>
             <Grid container spacing={3} style={{ paddingTop: "40px" }}>
                 <Grid item xs={12} md={4} xl={4} style={{
@@ -187,6 +204,9 @@ export default function Accountdetail() {
                             Upload
                         </Button>
                     </label>
+                    <Button size="small" style={{ color: "#4285f4", marginTop: "30px" }} onClick={handleChangePassword} startIcon={<VpnKeyIcon />} >
+                        Change Password
+                    </Button>
                 </Grid>
                 <Grid container xs={12} md={6} style={{ paddingLeft: "40px" }} >
                     <Grid item xs={12} md={12} sm={12} xl={12} style={{ paddingTop: '10px' }}>
@@ -337,5 +357,21 @@ export default function Accountdetail() {
                 </Snackbar>
             </div>
         </div >
+        :
+        <div className="progress" style={{
+            position: "fixed",
+            top: "80px",
+            bottom: "0px",
+            display: (loading) ? "flex" : "none",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: "1000",
+            width: "100%",
+            height: "100%",
+            borderRadius: "0",
+            backgroundColor: "white"
+        }} >
+            <CircularProgress />
+        </div>
     )
 }

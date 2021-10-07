@@ -27,7 +27,7 @@ export default function Filter(props) {
     }, [])
     return (
         <div className="filterDiv">
-            <h2>Batches</h2>
+            <h2 className="titleBatch">Batches</h2>
             <div className="filters">
                 <select onChange={(e) => {
                     props.onFilterChange(e.target.value);

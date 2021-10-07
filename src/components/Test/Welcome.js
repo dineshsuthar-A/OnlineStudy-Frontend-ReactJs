@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import './welcome.css';
 import React, { useState, useEffect } from 'react';
 import { Button } from '@material-ui/core';
@@ -19,6 +20,13 @@ export default function Welcome(props) {
             setloading(false);
         });
     }
+    const submit = () => {
+        history.push({
+            pathname: "/test",
+            state: { paperId: props.history.location.state.id }
+        })
+    }
+
     useEffect(() => {
         getdata();
     }, []);
@@ -39,12 +47,7 @@ export default function Welcome(props) {
                             <p>Marks Per Question: {data.markPerQuestion} marks</p>
                             <p> Attempt Limit : {data.attemptLimit}</p>
                             <p>Time Duration : {data.duration} mins</p>
-                            <Button variant="contained" className="btnAttempt" style={{ marginTop: "50px" }} onClick={() => {
-                                history.push({
-                                    pathname: "/test",
-                                    state: { paperId: props.history.location.state.id }
-                                })
-                            }}>Attempt Test</Button>
+                            <Button variant="contained" className="btnAttempt" style={{ marginTop: "50px" }} onClick={submit}>Attempt Test</Button>
 
                         </div>
                     </Grid>

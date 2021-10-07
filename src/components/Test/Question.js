@@ -2,7 +2,7 @@
 import { RadioGroup } from '@material-ui/core';
 import { FormControlLabel } from '@material-ui/core';
 import { Radio } from '@material-ui/core';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Grid } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
@@ -15,11 +15,22 @@ import { baseImageUrl } from '../../config';
 import Axios from 'axios';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { useHistory } from 'react-router';
-
-
+import parse from 'html-react-parser';
+import { Prompt } from 'react-router';
 
 
 export default function Question(props) {
+
+
+    window.addEventListener("beforeunload", function (e) {
+        // eslint-disable-next-line no-useless-escape
+        var confirmationMessage = "\o/";
+        e.returnValue = confirmationMessage;
+        return confirmationMessage;
+    });
+
+    const btnRef = useRef();
+    const [timerfinish, setTimerfinish] = useState();
     const [ans, setAns] = useState([]);
     const [allquestion, setAllquestion] = useState();
     const [loading, setloading] = useState(true);
@@ -35,13 +46,47 @@ export default function Question(props) {
     const [subject, setsubjects] = useState();
     const history = useHistory();
     const [actall, setactall] = useState(true);
-
+    const [hours, sethours] = useState();
+    const [minute, setminute] = useState();
+    const [seconds, setSeconds] = useState();
 
     const allsubject = () => {
         getsubject().then((response) => {
             setsubjects(response.data);
         });
     }
+
+    const startTimer = (mins) => {
+        var h = mins / 60;
+        var hour = Math.floor(mins / 60);
+        var m = (h - hour) * 60;
+        var min = Math.round(m);
+        var sec = Math.round((m - min) * 60);
+        var interval = setInterval(() => {
+            sec = sec - 1;
+            if (sec <= 0) {
+                if (min <= 0) {
+                    if (hour <= 0) {
+                        clearInterval(interval);
+                        setTimerfinish(1);
+                        btnRef.current.click();
+
+                    } else {
+                        hour = hour - 1;
+                        min = 59;
+                        sec = 59;
+                    }
+                } else {
+                    min = min - 1;
+                    sec = 59;
+                }
+            }
+            sethours(hour);
+            setminute(min);
+            setSeconds(sec);
+        }, 1000)
+    }
+
 
     const handleclick = () => {
         setsidebar(!sidebar)
@@ -246,6 +291,7 @@ export default function Question(props) {
             for (k = 0; k < ans.length; k++) {
                 if (currentQuestion[i].id !== ans[k].questionId) {
                     temp.push(ans[k]);
+
                 }
             }
             setAns(temp);
@@ -301,9 +347,9 @@ export default function Question(props) {
             setD(false);
         }
     }
-
     const getQuestions = () => {
         getTest(props.location.state.paperId).then((response) => {
+
             setCurrentQuestion(response.data.mcQuestions);
             setAllquestion(response.data.mcQuestions);
             var sub = []
@@ -323,6 +369,7 @@ export default function Question(props) {
             setsubId(sub);
             setData(response.data);
             setloading(false);
+            startTimer(response.data.duration);
         });
     }
 
@@ -331,37 +378,45 @@ export default function Question(props) {
         return q > -1 ? true : false;
     }
 
+
     const finishquiz = () => {
-        var token = localStorage.getItem("token");
-        let arr = [];
-        for (var p = 0; p < allquestion.length; p++) {
-            var flag = 0;
-            for (var l = 0; l < ans.length; l++) {
-                if (allquestion[p].id === ans[l].questionId) {
-                    flag = 1;
-                    arr.push(ans[l]);
+        var prop;
+        if (!timerfinish) {
+            prop = window.confirm("Are you sure you want to finish the exam?");
+        } else {
+            prop = true;
+        }
+        if (prop) {
+            var token = localStorage.getItem("token");
+            let arr = [];
+            for (var p = 0; p < allquestion?.length; p++) {
+                var flag = 0;
+                for (var l = 0; l < ans.length; l++) {
+                    if (allquestion[p].id === ans[l].questionId) {
+                        flag = 1;
+                        arr.push(ans[l]);
+                    }
+                }
+                if (flag === 0) {
+                    arr.push({ "questionId": allquestion[p].id, "studentAnswer": null });
                 }
             }
-            if (flag === 0) {
-                arr.push({ "questionId": allquestion[p].id, "studentAnswer": null });
+            Axios.post("/api/TestPaperApi/submittest", {
+                paperId: data.id,
+                mcQuestions: arr
+            }, {
 
-            }
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            }).then((response) => {
+                let id = response.data.id;
+                history.push({
+                    pathname: "/resultdetail",
+                    state: { id }
+                })
+            });
         }
-        Axios.post("/api/TestPaperApi/submittest", {
-            paperId: data.id,
-            mcQuestions: arr
-        }, {
-
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        }).then((response) => {
-            let id = response.data.id;
-            history.push({
-                pathname: "/resultdetail",
-                state: { id }
-            })
-        });
     }
     const handlemap = (item) => {
         for (var d = 0; d < subid.length; d++) {
@@ -450,13 +505,19 @@ export default function Question(props) {
         }
         return false;
     }
+    const Check = () => {
+        if (localStorage.getItem("test") === "true") {
+            history.push({
+                pathname: "/"
+            })
+        }
+    }
 
     useEffect(() => {
+        Check();
         getQuestions();
         allsubject();
-
     }, [])
-
 
     return (<>
         <div className="progress" style={{
@@ -474,16 +535,16 @@ export default function Question(props) {
         }} >
             <CircularProgress />
         </div>
+        {(currentQuestion?.length) ?
 
-        {(currentQuestion != null) ?
 
             <div style={{ backgroundColor: "rgb(249,249,249)" }}>
 
 
                 <div style={{ backgroundColor: "white", color: "black", padding: "10px", width: '100%', height: '75px', paddingLeft: "20px", borderBottom: "1px solid #d3d3d3", marginBottom: "10px" }}>
-                    <h3 style={{ width: "68%" }}> {data.name}</h3>
+                    <h3 className="headTest" > {data.name}</h3>
                     <button type="button" className="buttonSidebar" onClick={handleclick} ><ArrowBackIosIcon /></button>
-                    <p style={{ position: "absolute", right: '0', top: '0', marginTop: "30px", border: "0", borderStartStartRadius: "100px", padding: "10px", fontSize: "18px" }}>Time Left  <span style={{ color: "black", fontWeight: "bold" }}> 100 </span> </p>
+                    <p style={{ position: "absolute", right: '0', top: '0', marginTop: "30px", border: "0", borderStartStartRadius: "100px", padding: "10px", fontSize: "18px" }}>Time Left  <span style={{ color: "black", fontWeight: "bold" }}> {(hours < 10) ? "0" + hours : hours}:{(minute < 10) ? "0" + minute : minute}:{(seconds < 10) ? "0" + seconds : seconds} </span> </p>
                 </div>
 
                 <Grid container style={{ width: "100%" }}>
@@ -501,7 +562,9 @@ export default function Question(props) {
 
                     <Grid item xs={12} sm={9} md={9}>
                         <div style={{ backgroundColor: "#f9f9f9", display: "flex", alignContent: "center", flexDirection: "column", justifyContent: "center", paddingBottom: "20px", marginLeft: "10px", marginRight: "10px", border: "1px solid #d3d3d3" }}>
-                            <h6 style={{ backgroundColor: "#f2f2f2", color: "#337ab7", padding: "20px" }}><span>{i + 1}</span><span>. </span>{(currentQuestion[i].hindiQuestion == null) ? currentQuestion[i].englishQuestion : currentQuestion[i].hindiQuestion}</h6>
+                            <h6 style={{ backgroundColor: "#f2f2f2", lineHeight: "25px", color: "#337ab7", padding: "20px" }}><span>{i + 1}. </span>{(currentQuestion[i].hindiQuestion != null) ? parse(currentQuestion[i].hindiQuestion) : undefined}<span>{(currentQuestion[i].englishQuestion != null) ? parse(currentQuestion[i].englishQuestion) : undefined} </span></h6>
+
+
                             {
                                 (currentQuestion[i].questionPhoto != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "280px", alignSelf: "center" }} src={baseImageUrl + currentQuestion[i].questionPhoto} alt="Not Loaded. Check you internet connection" /> : undefined
                             }
@@ -509,16 +572,25 @@ export default function Question(props) {
                             <RadioGroup aria-label="gender" name="gender1" style={{ paddingLeft: "20px" }}  >
                                 <Grid container spacing={3}>
                                     <Grid item xs={12} md={6}>
-                                        <FormControlLabel checked={a} onClick={handleA} control={<Radio />} label={(currentQuestion[i].engAnsA == null) ? (currentQuestion[i].hinAnsA == null) ? (currentQuestion[i].photoA != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + currentQuestion[i].photoA} alt="Not Loaded. Check you internet connection" /> : undefined : currentQuestion[i].hinAnsA : currentQuestion[i].engAnsA}></FormControlLabel>
+                                        <FormControlLabel checked={a} onClick={handleA} control={<Radio />} label={<p style={{ margin: "0px", padding: "0px" }}>{(currentQuestion[i].engAnsA != null) ? parse(currentQuestion[i].engAnsA) : null} <span>{(currentQuestion[i].hinAnsA != null) ? parse(currentQuestion[i].hinAnsA) : null}
+                                        </span>
+
+                                            {(currentQuestion[i].photoA != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "150px", alignSelf: "center" }} src={baseImageUrl + currentQuestion[i].photoA} alt="Not Loaded. Check you internet connection" /> : undefined} </p>} ></FormControlLabel>
                                     </Grid>
                                     <Grid item xs={12} md={6}>
-                                        <FormControlLabel checked={b} onClick={handleB} control={<Radio />} label={(currentQuestion[i].engAnsB == null) ? (currentQuestion[i].hinAnsB == null) ? (currentQuestion[i].photoB != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + currentQuestion[i].photoB} alt="Not Loaded. Check you internet connection" /> : undefined : currentQuestion[i].hinAnsB : currentQuestion[i].engAnsB} />
+                                        <FormControlLabel checked={b} onClick={handleB} control={<Radio />} label={<p style={{ margin: "0px", padding: "0px" }}>{(currentQuestion[i].engAnsB != null) ? parse(currentQuestion[i].engAnsB) : null} <span>{(currentQuestion[i].hinAnsB != null) ? parse(currentQuestion[i].hinAnsB) : null}</span>
+
+                                            {(currentQuestion[i].photoB != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "150px", alignSelf: "center" }} src={baseImageUrl + currentQuestion[i].photoB} alt="Not Loaded. Check you internet connection" /> : undefined} </p>} />
                                     </Grid>
                                     <Grid item xs={12} md={6}>
-                                        <FormControlLabel checked={c} onClick={handleC} control={<Radio />} label={(currentQuestion[i].engAnsC == null) ? (currentQuestion[i].hinAnsC == null) ? (currentQuestion[i].photoC != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + currentQuestion[i].photoC} alt="Not Loaded. Check you internet connection" /> : undefined : currentQuestion[i].hinAnsC : currentQuestion[i].engAnsC} />
+                                        <FormControlLabel checked={c} onClick={handleC} control={<Radio />} label={<p style={{ margin: "0px", padding: "0px" }}>{(currentQuestion[i].engAnsC != null) ? parse(currentQuestion[i].engAnsC) : null} <span>{(currentQuestion[i].hinAnsC != null) ? parse(currentQuestion[i].hinAnsC) : null}</span>
+
+                                            {(currentQuestion[i].photoC != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "150px", alignSelf: "center" }} src={baseImageUrl + currentQuestion[i].photoC} alt="Not Loaded. Check you internet connection" /> : undefined} </p>} />
                                     </Grid>
                                     <Grid item xs={12} md={6}>
-                                        <FormControlLabel checked={d} onClick={handleD} control={<Radio />} label={(currentQuestion[i].engAnsD == null) ? (currentQuestion[i].hinAnsD == null) ? (currentQuestion[i].photoD != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "200px", alignSelf: "center" }} src={baseImageUrl + currentQuestion[i].photoD} alt="Not Loaded. Check you internet connection" /> : undefined : currentQuestion[i].hinAnsD : currentQuestion[i].engAnsD} />
+                                        <FormControlLabel checked={d} onClick={handleD} control={<Radio />} label={<p style={{ margin: "0px", padding: "0px" }}>{(currentQuestion[i].engAnsD != null) ? parse(currentQuestion[i].engAnsD) : null} <span>{(currentQuestion[i].hinAnsD != null) ? parse(currentQuestion[i].hinAnsD) : null}</span>
+
+                                            {(currentQuestion[i].photoD != null) ? <img style={{ backgroundColor: "f2f2f2", padding: "10px", width: "150px", alignSelf: "center" }} src={baseImageUrl + currentQuestion[i].photoD} alt="Not Loaded. Check you internet connection" /> : undefined} </p>} />
                                     </Grid>
                                 </Grid>
                             </RadioGroup>
@@ -546,13 +618,7 @@ export default function Question(props) {
                             </Button>
                         </div>
                     </Grid>
-
-
                 </Grid>
-
-
-
-
                 <div className={sidebar ? "leftBars" : "leftBarsactive"}>
                     <div className="closeSidebar" onClick={handleclick}>
                         <CloseIcon />
@@ -573,11 +639,23 @@ export default function Question(props) {
                             })
                         }
                     </div>
-                    <Button variant="contained" onClick={finishquiz} className="finishButton" >Finish Quiz</Button>
+                    <Button ref={btnRef} variant="contained" onClick={finishquiz} className="finishButton" >Finish Quiz</Button>
                 </div>
+                <Prompt
+                    message={(location, action) => {
+                        if (action === 'POP') {
+                            return location.pathname.startsWith("/app")
+                                ? true
+                                : `Are you sure you want to go to ${location.pathname}? You will lost all your progress.`
+                        }
 
+                    }}
+                />
             </div>
-            : null}
+
+            : <div style={{ backgroundColor: "white", textAlign: "center", verticalAlign: "center" }}>
+                <h1 style={{ color: "RED" }}>SORRY!! NO QUESTION AVALABLE</h1>
+            </div>}
 
     </>)
 }

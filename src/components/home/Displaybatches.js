@@ -19,6 +19,8 @@ import Axios from 'axios';
 import { getSubscribtions } from '../../service/subscribeApi';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { basePaymentUrl } from '../../config';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 const styles = (theme) => ({
     root: {
         margin: 0,
@@ -31,6 +33,9 @@ const styles = (theme) => ({
         color: theme.palette.grey[500],
     },
 });
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const DialogTitle = withStyles(styles)((props) => {
     const { children, classes, onClose, ...other } = props;
@@ -104,12 +109,18 @@ export default function Displaybatches() {
     const [closingTime, setClosing] = useState('');
     const [fees, setFees] = useState('');
     const [ids, setIds] = useState('');
+    const [openerror, setOpenerror] = useState(false);
 
-
+    const handlesnackerrorClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenerror(false);
+    };
 
 
     const handleClickOpen = (id) => {
-        token = localStorage.getItem("token");
+        var token = localStorage.getItem("token");
         var subs;
         var flag = 0;
         getSubscribtions().then((response) => {
@@ -118,7 +129,7 @@ export default function Displaybatches() {
                 if (subs[i].batchId === id) {
                     flag = 1;
                     history.push({
-                        pathname: "/demo",
+                        pathname: "/subscribed",
                         state: { id }
                     });
                     break;
@@ -144,7 +155,9 @@ export default function Displaybatches() {
                 setClosing(formatDate(response.data.closeDate.split("T")[0]));
                 setDescription(response.data.description);
                 setFees(response.data.fees);
-            });
+            }).catch(() => {
+                history.push("/home")
+            })
 
         }
     };
@@ -152,7 +165,23 @@ export default function Displaybatches() {
         setOpen(false);
     }
     const handlesubClose = () => {
-        window.open(basePaymentUrl + "?batchid=" + ids + "&mobilenumber=" + localStorage.getItem("mobile"), "nw", "height:500,width=600");
+
+
+        window.addEventListener("message", (e) => {
+            let data = e.data.split(";");
+            if (data[0] === "TXN_SUCCESS") {
+                history.push({
+                    pathname: "/subscribed",
+                    state: { id: ids, reload: 'true' }
+                });
+            } else {
+                setOpenerror(true);
+            }
+            w.close();
+        });
+        var w = window.open(basePaymentUrl + "?batchid=" + ids + "&mobilenumber=" + localStorage.getItem("mobile"), "nws", "height:500,width=600");
+
+
         setOpen(false);
     };
 
@@ -164,29 +193,26 @@ export default function Displaybatches() {
         setOpen(false);
     }
 
-    var token;
-    const check = () => {
-        token = localStorage.getItem("token");
 
-        if (token == null) {
-            history.push("/login");
-        }
-        else {
-            getdata();
-        }
-    }
 
     const getdata = () => {
+        if (localStorage.getItem("log")) {
+            localStorage.removeItem("log");
+            window.location.reload();
+        }
         getBatch().then((response) => {
             setData(response.data);
             setloading(false);
+        }).catch(() => {
+            localStorage.removeItem("token");
+            history.push("/home");
         });
     };
 
 
     const [id, setID] = useState();
     useEffect(() => {
-        check();
+        getdata();
     }, []);
 
     return ((!loading) ?
@@ -244,6 +270,12 @@ export default function Displaybatches() {
                         </Button>
                     </DialogActions>
                 </Dialog>
+
+                <Snackbar open={openerror} autoHideDuration={6000} onClose={handlesnackerrorClose}>
+                    <Alert onClose={handlesnackerrorClose} severity="error">
+                        Payment Failed! :(
+                    </Alert>
+                </Snackbar>
 
             </div>
         </>

@@ -13,6 +13,12 @@ import { useHistory } from 'react-router-dom';
 import { basePaymentUrl } from '../../config';
 import { getSubscribtions } from '../../service/subscribeApi';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import { getallresult } from '../../service/Result';
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const StyledTableCell = withStyles((theme) => ({
     head: {
@@ -33,7 +39,7 @@ const StyledTableRow = withStyles((theme) => ({
 }))(TableRow);
 const useStyles = makeStyles({
     table: {
-        minWidth: 350,
+        minWidth: 300,
     },
 });
 
@@ -43,22 +49,50 @@ export default function Demodetail(props) {
     var token;
     token = localStorage.getItem("token");
     const [checksub, setchecksub] = useState(false);
+    const [resultData, setResultData] = useState();
+    const [openerror, setOpenerror] = useState(false);
+    const [openr, setOpenr] = useState(false);
+    const handlesnackClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenr(false);
+    };
+    const handlesnackerrorClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenerror(false);
+    };
 
     const getsubs = () => {
+        if (props.location.reload) {
+            window.location.reload();
+        }
         getSubscribtions().then((response) => {
-            var q = response.data.filter((item) => item.batchId === props.location.state.id);
+            var q = response.data.filter((item) => item.batchId.toString() === props.location.state.id.toString());
             if (q.length) {
                 setchecksub(true);
+
             } else {
                 setchecksub(false);
             }
-        })
+            gettestdata();
+        }).catch(() => {
+            localStorage.removeItem("token");
+            history.push("/home");
+        });
+
+        getallresult().then((response) => {
+            setResultData(response.data);
+            setloading(false);
+        });
 
     }
 
     const [data, setdata] = useState();
     const gettestdata = () => {
-
         Axios.get("/api/BatchApi/get", {
             params: {
                 id: props.location.state.id
@@ -68,13 +102,15 @@ export default function Demodetail(props) {
             }
         }).then((response) => {
             setdata(response.data);
-            setloading(false);
+
             settestpapers(response.data.testPapers);
-        })
+        }).catch(() => {
+            history.push("/home");
+        });
     }
     useEffect(() => {
         getsubs();
-        gettestdata();
+        localStorage.setItem("test", false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     const classes = useStyles();
@@ -82,6 +118,9 @@ export default function Demodetail(props) {
 
 
     const onButtonClick = (testId, Type) => {
+
+        localStorage.removeItem("time");
+        localStorage.removeItem("answers");
         if (Type !== 0) {
             history.push({
                 pathname: "/testlogin",
@@ -93,8 +132,32 @@ export default function Demodetail(props) {
                 state: { id: testId, batchId: props.location.state.id }
             })
         } else {
-            window.open(basePaymentUrl + "?batchid=" + props.location.state.id + "&mobilenumber=" + localStorage.getItem("mobile"), "nw", "height:500,width=600");
+            window.addEventListener("message", (e) => {
+                let data = e.data.split(";");
+                if (data[0] === "TXN_SUCCESS") {
+                    setOpenr(true);
+                    window.location.reload();
+                } else {
+                    setOpenerror(true);
+                }
+                w.close();
+            });
+            var w = window.open(basePaymentUrl + "?batchid=" + props.location.state.id + "&mobilenumber=" + localStorage.getItem("mobile"), "nws", "height:500,width=600");
         }
+    }
+
+    const checkAttempts = (rowdata) => {
+
+        const len = resultData.filter((item) => rowdata.id === item.testPaperId);
+        var limit = 0;
+        var rc = len ? len.length : 0;
+        if ((rowdata.attemptLimit - rc) > 0) {
+            limit = rowdata.attemptLimit - rc;
+        } else {
+            limit = 0;
+        }
+        return limit;
+
     }
 
 
@@ -116,19 +179,31 @@ export default function Demodetail(props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {testpapers.map((row) => (
-                            <StyledTableRow key={row.name}>
-                                <StyledTableCell component="th" scope="row">
-                                    {row.name}
-                                </StyledTableCell>
-                                <StyledTableCell >{row.attemptLimit}</StyledTableCell>
-                                <StyledTableCell align="right"><Button variant="contained" color={(row.testPaperType !== 0) ? "primary" : (checksub) ? "primary" : "secondary"} style={{ width: "100px" }} onClick={() => onButtonClick(row.id, row.testPaperType)} > {(row.testPaperType !== 0) ? "Attempt" : (checksub) ? "Attempt" : "Subscribe"}</Button></StyledTableCell>
-                            </StyledTableRow>
-                        ))}
+                        {resultData &&
+                            testpapers.map((row) => (
+                                <StyledTableRow key={row.name}>
+                                    <StyledTableCell component="th" scope="row">
+                                        {row.name}
+                                    </StyledTableCell>
+                                    <StyledTableCell >{checkAttempts(row)}</StyledTableCell>
+                                    <StyledTableCell align="right"><Button variant="contained" disabled={(checkAttempts(row) === 0) ? true : false} color={(row.testPaperType !== 0) ? "primary" : (checksub) ? "primary" : "secondary"} style={{ width: "100px" }} onClick={() => onButtonClick(row.id, row.testPaperType)} > {(row.testPaperType !== 0) ? "Attempt" : (checksub) ? "Attempt" : "Subscribe"}</Button></StyledTableCell>
+                                </StyledTableRow>
+                            ))}
                     </TableBody>
                 </Table>
             </TableContainer>
-        </div>
+            <Snackbar open={openr} autoHideDuration={6000} onClose={handlesnackClose}>
+                <Alert onClose={handlesnackClose} severity="success">
+                    Payment Successful!
+                </Alert>
+            </Snackbar>
+            <Snackbar open={openerror} autoHideDuration={6000} onClose={handlesnackerrorClose}>
+                <Alert onClose={handlesnackerrorClose} severity="error">
+                    Payment Failed! :(
+                </Alert>
+            </Snackbar>
+
+        </div >
         :
         <div className="progress" style={{
             position: "fixed",

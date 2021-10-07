@@ -232,7 +232,6 @@ export default function ResultDetail(props) {
             obj = { id: filterResult.id, testPaperId: filterResult.testPaperId, correctAnswers, mcQuestions, skipped, paper, outOfRank, rank, date };
             console.log(obj);
             setresult(obj);
-
         }
     }
     const handleClass = (id) => {
@@ -247,6 +246,7 @@ export default function ResultDetail(props) {
 
     useEffect(() => {
         getResult();
+        localStorage.setItem("test", true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     return (

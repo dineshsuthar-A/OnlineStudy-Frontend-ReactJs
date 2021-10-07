@@ -93,6 +93,20 @@
      z-index: 100;
      border: 1px solid #d3d3d3;
 }
+.headTest{
+    width: 60%; 
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    text-overflow: ellipsis; 
+    overflow: hidden; 
+}
+@media screen and (max-width:390px) {
+    .headTest{
+        display: none;
+    }
+}
 @media screen and (max-width:610px) {
     .leftBars{
         right: -100%;

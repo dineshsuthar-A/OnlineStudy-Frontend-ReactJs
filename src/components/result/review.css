@@ -2,11 +2,12 @@
     background-color: #f2f2f2;
     color: green;
     padding: 20px ;
+   
 }
 .skippedQuestion{
     background-color: #f2f2f2;
     color: #337ab7;
-    padding: 20px ;
+    padding: 20px;
 }
 .wrongQuestion{
     background-color: #f2f2f2;
@@ -16,14 +17,16 @@
 }
 
 .answer{
-    padding-left: 10px;
+    padding-left: 20px;
     color: black;
 }
 .correctAnswer{
-    padding-left: 10px;
+    padding-left: 20px;
     color: green;
+    font-weight: bold;
 }
 .wrongAnswer{
-    padding-left: 10px;
+    padding-left: 20px;
     color: red;
+    font-weight: bold;
 }

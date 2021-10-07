@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -18,7 +19,7 @@ export default function Subscription() {
     const history = useHistory();
     const [loading, setloading] = useState(true);
 
-    
+
     function formatDate(d) {
         var date = new Date(d);
 
@@ -53,16 +54,18 @@ export default function Subscription() {
     }
     const handleClick = (id) => {
         history.push({
-            pathname: "/demo",
+            pathname: "/subscribed",
             state: { id }
         })
     }
 
     const getall = () => {
         getSubscribtions().then((response) => {
-            console.log(response.data);
             setData(response.data);
             setloading(false);
+        }).catch((error) => {
+            history.push("/home");
+            localStorage.removeItem("token");
         })
     }
 

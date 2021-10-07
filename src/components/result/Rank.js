@@ -26,13 +26,11 @@ export default function Rank(props) {
     const [loading, setloading] = useState(true);
     const getrank = () => {
         rank(props.location.state.paperId, props.location.state.count).then((response) => {
-            console.log(response);
             setdata(response.data);
             setloading(false);
         })
     }
     useEffect(() => {
-        console.log(props);
         getrank();
     }, [])
     return (

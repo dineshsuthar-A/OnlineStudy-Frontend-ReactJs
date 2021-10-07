@@ -79,11 +79,15 @@ export default function Result() {
         getallresult().then((response) => {
             setdata(response.data);
             setloading(false);
-        })
+        }).catch(()=>{
+            localStorage.removeItem("token");
+            history.push("/home");
+        });
     }
 
     useEffect(() => {
         getresultinfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleitemClick = (id) => {
@@ -93,7 +97,23 @@ export default function Result() {
         })
     }
     const handlesearch = (e) => {
-        setSearch(e.target.value);
+        var str = e.target.value;
+        if (!str) {
+            setSearch(e.target.value);
+        }
+        if (((str.charCodeAt(str.length - 1)) >= 97 && (str.charCodeAt(str.length - 1)) <= 122) || ((str.charCodeAt(str.length - 1)) >= 65 && (str.charCodeAt(str.length - 1)) <= 90)) {
+            setSearch(e.target.value);
+        }
+        if (str === " ") {
+            setSearch(e.target.value);
+        }
+        if ((str.charCodeAt(str.length - 1)) >= 48 && (str.charCodeAt(str.length - 1)) <= 57) {
+            setSearch(e.target.value);
+        }
+        if (str.charCodeAt(str.length - 1) === 32) {
+            setSearch(e.target.value);
+        }
+
     }
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -109,6 +129,7 @@ export default function Result() {
                             placeholder="Search.."
                             inputProps={{ 'aria-label': 'search google maps' }}
                             onChange={handlesearch}
+                            value={search}
                         />
                         <IconButton type="submit" className={classes.iconButton} aria-label="search">
                             <SearchIcon />
@@ -130,6 +151,7 @@ export default function Result() {
                             <TableBody>
                                 {data &&
                                     (search ? (data.filter((q) => {
+
                                         if ((q.paper.name.toLowerCase()).search(search.toLowerCase()) === -1)
                                             return false;
                                         else

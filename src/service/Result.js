@@ -8,6 +8,16 @@ export function getallresult() {
         }
     });
 }
+export function getallresultbyBatch(id) {
+    return Axios.get("/api/ResultApi/getbybatch", {
+        params: {
+            batchId: id
+        },
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    });
+}
 
 export function getresult(id) {
     return Axios.get("/api/ResultApi/getresult", {

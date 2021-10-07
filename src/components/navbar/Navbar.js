@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import './navbar.css';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -37,7 +38,8 @@ import TableRow from '@material-ui/core/TableRow';
 import { baseImageUrl } from '../../config';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import { getallQueries, getmyQuery, postyouQuery } from '../../service/queryApi';
+import { useHistory } from 'react-router';
+import { getallQueries, getmyQuery, postyouQuery, getNews } from '../../service/queryApi';
 
 
 
@@ -106,6 +108,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ITEM_HEIGHT = 48;
 export default function MenuAppBar() {
+    const history = useHistory();
 
     function formatDate(d) {
         var date = new Date(d);
@@ -146,14 +149,39 @@ export default function MenuAppBar() {
         localStorage.removeItem("email");
         localStorage.removeItem("mobile");
     }
+
+    const [news, getnews] = useState();
+
+    const getNewsupdate = () => {
+        getNews().then((response) => {
+            getnews(response.data);
+        })
+    }
     //imagesetup
     const [img, setimg] = useState();
 
     const [search, setSearch] = useState();
 
+
     const handlechangeSearch = (e) => {
-        setSearch(e.target.value)
+        var str = e.target.value;
+        if (!str) {
+            setSearch(e.target.value);
+        }
+        if (((str.charCodeAt(str.length - 1)) >= 97 && (str.charCodeAt(str.length - 1)) <= 122) || ((str.charCodeAt(str.length - 1)) >= 65 && (str.charCodeAt(str.length - 1)) <= 90)) {
+            setSearch(e.target.value);
+        }
+        if (str === " ") {
+            setSearch(e.target.value);
+        }
+        if ((str.charCodeAt(str.length - 1)) >= 48 && (str.charCodeAt(str.length - 1)) <= 57) {
+            setSearch(e.target.value);
+        }
+        if (str.charCodeAt(str.length - 1) === 32) {
+            setSearch(e.target.value);
+        }
     }
+
     const handlesearchsubmit = (e) => {
         e.preventDefault();
         setSearch(search);
@@ -192,10 +220,18 @@ export default function MenuAppBar() {
     const handlesnackerrorClose = () => {
         setopenerror(false);
     }
+    const checkGet = () => {
+        if (localStorage.getItem("token") === null) {
+            history.push("/home");
+        }
+
+    }
     useEffect(() => {
+        checkGet();
         getdp();
         getallquery();
-    }, [img])
+        getNewsupdate();
+    }, [])
     //dialogue box functions
     const [opens, setOpen] = React.useState(false);
 
@@ -271,7 +307,16 @@ export default function MenuAppBar() {
     const handleNotificationClose = () => {
         setAnchorNotification(null);
     };
-
+    const notificationClick = (type, link) => {
+        if (type === 1) {
+            window.open(link, "_blank");
+        } else if (type === 5) {
+            history.push({
+                pathname: "/demo",
+                state: { id: link }
+            })
+        }
+    }
     const openNotification = Boolean(anchorNotification);
     const id = open ? 'simple-popover' : undefined;
 
@@ -281,7 +326,7 @@ export default function MenuAppBar() {
 
                 <p className="leftp"><Tooltip title="Menu"><IconButton className="sideBarButton" onClick={showSideBar}><MenuIcon style={{
                     color: "white"
-                }} /></IconButton></Tooltip><span className="logo"><Link to="/dashboard" className="logo-link">ONLINE STUDY</Link></span></p>
+                }} /></IconButton></Tooltip><span className="logo"><Link to="/dashboard" className="logo-link">GYAN EDUCATION</Link></span></p>
                 <div className="menuOptions">
                     <ul className="rightitems">
                         <li className="nav-text-horizontal"><NavLink to="/dashboard" exact activeClassName="active"  ><DashboardIcon /><span className="spanText">Dashboard</span></NavLink></li>
@@ -305,6 +350,7 @@ export default function MenuAppBar() {
                                     <InputBase
                                         className={classes.input}
                                         onChange={handlechangeSearch}
+                                        value={search}
                                         placeholder="Search.."
                                         inputProps={{ 'aria-label': 'search google maps' }}
                                     />
@@ -444,7 +490,29 @@ export default function MenuAppBar() {
                                 fontFamily: "sans-serif"
                             }}>Notifications</h4>
                             <hr />
-                            <Typography className={classes.typography} style={{ margin: "10px" }}>No notification to show.</Typography>
+
+                            {news?.length ?
+                                news.filter((q) => {
+                                    if (q.linkType === 1 || q.linkType === 5)
+                                        return true;
+                                    else
+                                        return false;
+                                }).map((item) =>
+                                    <div style={{ border: "1px solid #d3d3d3", marginLeft: "4px", marginBottom: "5px", marginRight: "4px", paddingLeft: "10px", paddingTop: "10px", fontWeight: "bold", borderRadius: "5px", width: "300px", backgroundColor: "#b3d9ff", cursor: "pointer" }} onClick={() => notificationClick(item.linkType, item.link)} >
+                                        <p>{item.news}</p>
+                                    </div>
+                                )
+                                :
+                                <div style={{ border: "1px solid #d3d3d3", marginLeft: "4px", marginBottom: "5px", marginRight: "4px", fontWeight: "bold", borderRadius: "5px", width: "300px", backgroundColor: "#b3d9ff", textAlign: "center", paddingTop: "15px" }}>
+                                    <p>No notification to show.</p>
+                                </div>
+                            }
+
+
+
+
+
+
                         </Popover>
 
 
@@ -489,7 +557,7 @@ export default function MenuAppBar() {
                     <li className="navbar-toggle" onClick={showSideBar}>
                         <div className="header">
                             <img src={book} alt="Not loaded" className="imageTag" />
-                            <h4>Online Study</h4>
+                            <h4>GYAN EDUCATION</h4>
                         </div>
                         <ChevronLeftIcon /></li>
                     <li className="nav-text"><NavLink to="/dashboard" exact activeClassName="active" onClick={showSideBar} ><DashboardIcon /><span className="spanText">Dashboard</span></NavLink></li>

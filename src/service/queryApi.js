@@ -31,3 +31,11 @@ export function getmyQuery(id) {
         }
     })
 }
+
+export function getNews() {
+    return Axios.get("/api/NewsUpdateApi/getall", {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    })
+}

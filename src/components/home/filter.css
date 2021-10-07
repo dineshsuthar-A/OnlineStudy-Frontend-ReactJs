@@ -11,3 +11,20 @@
 .filters > select{
     padding: 10px;
 }
+
+@media screen and (max-width:420px) {
+    .titleBatch{
+        display: none;
+        visibility: hidden;
+    }
+    .filterDiv{
+        display: flex;
+        justify-content: center;
+        padding: 1%;
+        padding-right: 5%;
+        padding-left: 5%;
+        align-items: center;
+        background-color: white;
+    }
+    
+}

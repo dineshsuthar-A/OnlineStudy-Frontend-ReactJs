@@ -18,7 +18,7 @@ function Copyright() {
         <Typography variant="body2" color="textSecondary" align="center">
             {'Copyright © '}
             <Link color="inherit" href="/">
-                Online Exam
+                GYAN EDUCATION
             </Link>{' '}
             {new Date().getFullYear()}
             {'.'}
@@ -110,10 +110,12 @@ export default function SignUp() {
             }
         } else {
             register(email, mobile, password).then((response) => {
-                console.log(response);
-                localStorage.setItem("token", response.data.token);
                 history.push({
-                    pathname: "/"
+                    pathname: "/registration",
+                    state: {
+                        email,
+                        token: response.data.token
+                    }
                 })
             }).catch(errors => {
                 seterr("Please check all your credentials. Try again!!");
@@ -129,7 +131,9 @@ export default function SignUp() {
         setemail(e.target.value);
     }
     const mobileset = (e) => {
-        setmobile(e.target.value);
+        if (!isNaN(e.target.value))
+            if (e.target.value.length <= 10)
+                setmobile(e.target.value);
     }
 
 
@@ -168,6 +172,7 @@ export default function SignUp() {
                                     error={mobileerror}
                                     helperText={mobilehelp}
                                     required
+                                    value={mobile}
                                     fullWidth
                                     id="mobile"
                                     label="Mobile Number"

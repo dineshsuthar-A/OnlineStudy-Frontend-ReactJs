@@ -4,8 +4,6 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -20,7 +18,7 @@ function Copyright() {
         <Typography variant="body2" color="textSecondary" align="center">
             {'Copyright © '}
             <Link href="/" color="inherit">
-                Online Exam
+                GYAN EDUCATION
             </Link>{' '}
             {new Date().getFullYear()}
             {'.'}
@@ -48,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function SignIn() {
+export default function Login() {
     const [checkmobile, setcheckmobile] = useState(false);
     const [checkpassword, setcheckpassword] = useState(false);
     const classes = useStyles();
@@ -65,9 +63,6 @@ export default function SignIn() {
             history.push("/")
         }
     }
-    useEffect(() => {
-        check();
-    }, [])
 
     const login = () => {
         Axios.post("/api/AccountApi/login", {
@@ -75,9 +70,9 @@ export default function SignIn() {
             mobileNumber: mobilenumber,
             password
         }).then((response) => {
-
             localStorage.setItem("token", response.data.token);
-            history.push("/");
+            localStorage.setItem("log", "true");
+            setTimeout(() => { history.push("/") }, 2000);
         }).catch(error => {
             setcheckmobile(true);
             setcheckpassword(true);
@@ -122,9 +117,15 @@ export default function SignIn() {
 
     }
     const handleMobile = (e) => {
-        setMobilenumber(e.target.value);
+        if (!isNaN(e.target.value))
+            if (e.target.value.length <= 10)
+                setMobilenumber(e.target.value);
 
     }
+
+    useEffect(() => {
+        check();
+    }, [])
 
 
     return (
@@ -138,7 +139,7 @@ export default function SignIn() {
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    <form className={classes.form} onSubmit={handleSubmit} noValidate>
+                    <form className={classes.form} onSubmit={handleSubmit} noValidate >
                         <TextField
                             variant="standard"
                             margin="normal"
@@ -169,10 +170,6 @@ export default function SignIn() {
                             type="password"
                             id="password"
                             autoComplete="current-password" />
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="Remember me"
-                        />
                         <Button
                             type="submit"
                             fullWidth
@@ -184,7 +181,7 @@ export default function SignIn() {
                         </Button>
                         <Grid container>
                             <Grid item xs>
-                                <Link href="#" variant="body2">
+                                <Link href="/forgotPassword" variant="body2">
                                     Forgot password?
                                 </Link>
                             </Grid>
